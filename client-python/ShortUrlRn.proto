@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package shorturlrn;
+import "google/protobuf/timestamp.proto";
+
+message UserRequests {
+    string username = 1;
+}
+
+message UserUrlListResponses {
+    repeated ShortURL urls = 1;
+}
+
+message CreateUrlRequests {
+    string username = 1;
+    string originalUrl = 2;
+}
+
+message ShortURL {
+    int64 id = 1;
+    string shortUrl = 2;
+    string originalUrl = 3;
+    User user = 4;
+    int32 accessCount = 5;
+    repeated UrlAccessLog accessLogs = 6;
+}
+
+message User {
+    string username = 1;
+    string name = 2;
+    bool admin = 3;
+    bool author = 4;
+    Image profilePicture = 5;
+}
+
+message Image {
+  int64 id = 1;
+  string name = 2;
+  string mimeType = 3;
+  string fotoBase64 = 4;
+}
+
+message UrlAccessLog {
+    int64 id = 1;
+    string ip = 2;
+    string browser = 3;
+    string clientDomain = 4;
+    string os = 5;
+    google.protobuf.Timestamp accessTime = 6;
+}
+
+message ShortUrlResponses {
+    string originalUrl = 1;
+    string shortUrl = 2;
+    google.protobuf.Timestamp createdAt = 3;
+    string previewImageBase64 = 4;
+}
+
+service ShortUrlRn {
+    rpc getUrlsByUser (UserRequests) returns (UserUrlListResponses);
+    rpc createShortUrlAPI (CreateUrlRequests) returns (ShortUrlResponses);
+}
