@@ -156,7 +156,7 @@ public class Main {
                 });
             });
             
-        }).start(1000);
+        }).start(7000);
 
         app.ws("/chat", ws -> {
 
