@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="/css/table.css">
+    <script src="/js/app.js"></script>
+    <style>
+        .offline-indicator {
+            display: none;
+            background-color: #ff4444;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            margin-bottom: 50px;
+        }
+
+        /* Hide offline.js UI elements */
+        .offline-ui {
+            display: none !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/offline-js@0.7.19/offline.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/offline-js@0.7.19/themes/offline-theme-default.css">
+
+    <title>Short URL</title>
+</head>
+
+<body>
+
+
+
+    <header>
+
+        <h2>¡Bienvenido, <span th:text="${user}"></span>! - Listado URL Acortados</h2>
+
+        <nav role="custom-dropdown">
+            <input type="checkbox" id="button">
+            <label for="button" onclick></label>
+
+            <ul>
+
+                <!-- Opción condicional en el menú -->
+                <li>
+                    <!-- Mostrar "Crea un Usuario!" si NO está logueado -->
+                    <form action="/closeSession" method="post" class="d-inline"
+                        onsubmit="return handleMenuNavigation(this)" th:if="${isLogIn}">
+                        <button type="submit" class="nav-link">Cerrar Sesión</button>
+                    </form>
+
+                    <!-- Mostrar "Cerrar Sesión" si ESTÁ logueado -->
+                    <a href="/login.html" class="nav-link" onsubmit="return handleMenuNavigation(this)"
+                        th:if="${not isLogIn}">Iniciar Sesión</a>
+                </li>
+                <li>
+                    <a href="viewListArticle"><button type="button" class="nav-link"
+                            onsubmit="return handleMenuNavigation(this)">Lista de Artículos</button></a>
+                </li>
+                <li>
+                    <a href="createShortURL.html"><button type="button" class="nav-link"
+                            onsubmit="return handleMenuNavigation(this)">Generar URL acortado</button></a>
+                </li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <div id="offline-indicator" class="offline-indicator">
+        Estás actualmente offline. （◞‿◟）
+    </div>
+
+    <div class="container">
+        <ul class="responsive-table">
+
+            <!--<li class="table-header">
+                <div class="col">URL acortado</div>
+                <div class="col">URL Original</div>
+                <div class="col">QR</div>
+                <div class="col">Acciones</div>
+            </li>-->
+            <li class="table-row" th:each="urlList : ${urlList}">
+
+                <div>
+                    <a id="short-url" th:href="|http://${domain}/url/${urlList.shortUrl}|"
+                        th:text="|http://${domain}/url/${urlList.shortUrl}|"></a>
+                </div>
+                <div class="col" th:text="${#strings.abbreviate(urlList.originalUrl, 70)}"></div>
+                <div class="col qrcode" th:attr="data-url=${urlList.shortUrl}"></div>
+                <div class="col">
+                    <form action="/viewShortUrlLogs" method="post" class="d-inline">
+                        <input type="hidden" name="shortUrlId" th:value="${urlList.id}">
+                        <input type="hidden" name="shortUrlLetter" th:value="${urlList.shortUrl}">
+                        <button type="submit" class="btn btn-default">Estadisticas</button>
+                    </form>
+                    <span class="mx-2" th:if="${canDeleted}">|</span>
+                    <form action="/deleteShortUrl" method="post" class="d-inline" th:if="${canDeleted}">
+                        <input type="hidden" name="shortUrlId" th:value="${urlList.id}">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+
+    </div>
+    </li>
+    </ul>
+
+
+    <!-- PAGINATION CONTROL in html (re-implament this)
+        <div>
+            <a th:if="${page > 1}" th:href="@{/viewListArticle(page=${page - 1}, pageSize=${pageSize})}">Previous</a>
+            <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                <a th:if="${i != page}" th:href="@{/viewListArticle(page=${i}, pageSize=${pageSize})}"
+                    th:text="${i}">Page</a>
+                <span th:unless="${i != page}" th:text="${i}">Page</span>
+            </span>
+            <a th:if="${page < totalPages}"
+                th:href="@{/viewListArticle(page=${page + 1}, pageSize=${pageSize})}">Next</a>
+        </div>-->
+
+
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script th:inline="javascript">
+        const domain = /*[[${domain}]]*/ "fallback";
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".qrcode").forEach(function (qrElement) {
+                let shortUrl = qrElement.getAttribute("data-url");
+
+                if (!shortUrl || shortUrl.trim() === '') {
+                    console.warn("Short URL is empty. QR Code generation skipped.");
+                    return;
+                }
+
+                let fullUrl = "http://" + domain + "/url/" + shortUrl;
+
+                new QRCode(qrElement, {
+                    text: fullUrl,
+                    width: 90,
+                    height: 90
+                });
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

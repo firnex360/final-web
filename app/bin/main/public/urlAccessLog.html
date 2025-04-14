@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+        <link rel="stylesheet" href="../css/menu.css">
+        <link rel="stylesheet" href="../css/table.css">
+        <link rel="stylesheet" href="../css/chat.css">
+    <title>Short URL Access</title>
+
+    <style>
+        .charts {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* PREVENT wrapping */
+        }
+    
+        .charts canvas {
+            width: auto !important;
+            height: auto !important;
+            background-color: #1e1e1e; /* Optional: dark background for contrast */
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        canvas {
+        background-color: #2c2c2c;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+        .stat-card {
+        background-color: #1e1e1e;
+        padding: 40px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 700px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        color: white;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .stat-card h3 {
+        margin-bottom: 20px;
+        font-size: 2rem;
+        color: #f0f0f0;
+    }
+
+    .stat-value {
+        font-size: 4rem;
+        font-weight: 900;
+        color: #4CAF50;
+}
+    </style>      
+
+</head>
+
+<body>
+
+    <header>
+        
+        <h2>Listado de Accesos</h2>
+
+        <nav role="custom-dropdown">
+            <input type="checkbox" id="button">
+            <label for="button" onclick></label>
+            
+            <ul>
+                <li>
+                    <a href="viewListShortUrl"><button type="submit" class="nav-link">Volver</button></a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <br>
+    
+    <div class="charts">
+        <canvas id="accessTimeChart" style="width:100%;max-width:700px"></canvas>
+        <canvas id="browserChart" style="width:100%;max-width:700px"></canvas>
+        <canvas id="osChart" style="width:100%;max-width:700px"></canvas>
+    
+        <div class="stat-card">
+            <h3>Total Accesos</h3>
+            <div class="stat-value" th:text="${totalAmount}"></div>
+        </div>
+    </div>
+    
+
+    <div class="container">
+
+        <ul class="responsive-table">
+            <li class="table-header">
+                <div class="col">URL acortado</div>
+                <div class="col">Access Time</div>
+                <div class="col">IP</div>
+                <div class="col">Browser</div>
+                <div class="col">Client Domain</div>
+                <div class="col">OS</div>
+            </li>
+            <!-- CHECK, NEEDS REVIEW-->
+            <li class="table-row" th:each="log : ${urlAccessLogs}">
+                <div><a th:href="|http://${domain}/url/${urlList}|"
+                       th:text="|http://${domain}/url/${urlList}|"></a></div>
+                <div class="col access-time" th:text="${#temporals.format(log.accessTime, 'MM-dd-yyyy HH:mm:ss')}"></div>
+                <div class="col ip" th:text="${log.ip}"></div>
+                <div class="col browser" th:text="${log.browser}"></div>
+                <div class="col clientDomain" th:text="${log.clientDomain}"></div>
+                <div class="col os" th:text="${log.os}"></div>
+            </li>
+        </ul>
+
+        <!-- PAGINATION CONTROL in html (re-implament this)
+        <div>
+            <a th:if="${page > 1}" th:href="@{/viewListArticle(page=${page - 1}, pageSize=${pageSize})}">Previous</a>
+            <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                <a th:if="${i != page}" th:href="@{/viewListArticle(page=${i}, pageSize=${pageSize})}"
+                    th:text="${i}">Page</a>
+                <span th:unless="${i != page}" th:text="${i}">Page</span>
+            </span>
+            <a th:if="${page < totalPages}"
+                th:href="@{/viewListArticle(page=${page + 1}, pageSize=${pageSize})}">Next</a>
+        </div>-->
+
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script>
+        Chart.defaults.global.defaultFontColor = "white";
+
+        // Browser counts
+        const browserElements = document.querySelectorAll('.table-row .browser');
+        const browserCounts = {};
+        browserElements.forEach(elem => {
+            const browser = elem.textContent.trim();
+            if (browser) {
+                browserCounts[browser] = (browserCounts[browser] || 0) + 1;
+            }
+        });
+        const browserLabels = Object.keys(browserCounts);
+        const browserData = Object.values(browserCounts);
+    
+        // OS counts
+        const osElements = document.querySelectorAll('.table-row .os');
+        const osCounts = {};
+        osElements.forEach(elem => {
+            const os = elem.textContent.trim();
+            if (os) {
+                osCounts[os] = (osCounts[os] || 0) + 1;
+            }
+        });
+        const osLabels = Object.keys(osCounts);
+        const osData = Object.values(osCounts);
+        
+        const barColors = [
+            "#b91d47", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145",
+            "#ff7f0e", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f"
+        ];
+    
+        // Browser chart
+        new Chart("browserChart", {
+
+            type: "pie",
+            data: {
+                labels: browserLabels,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: browserData
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Distribución de Navegadores"
+                }
+            }
+        });
+    
+        // OS chart
+        new Chart("osChart", {
+            type: "pie",
+            data: {
+                labels: osLabels,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: osData
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Distribución de Sistemas Operativos"
+                }
+            }
+        });
+    </script>
+    
+    <script>
+        const timeElements = document.querySelectorAll('.table-row .access-time');
+        const accessTimeCounts = {};
+    
+        timeElements.forEach(elem => {
+            const fullTime = elem.textContent.trim(); // Ej: "04-06-2025 17:38:24"
+            // Recortar para quedarnos con "MM-dd-yyyy HH:mm"
+            const minuteTime = fullTime.substring(0, 16);
+            if (minuteTime) {
+                accessTimeCounts[minuteTime] = (accessTimeCounts[minuteTime] || 0) + 1;
+            }
+        });
+    
+        const accessLabels = Object.keys(accessTimeCounts).sort(); // Asegura orden cronológico
+        const accessData = Object.values(accessTimeCounts);
+    
+        new Chart("accessTimeChart", {
+            type: "line",
+            data: {
+                labels: accessLabels,
+                datasets: [{
+                    label: "Accesos por Minuto",
+                    borderColor: "#3e95cd",
+                    backgroundColor: "rgba(62, 149, 205, 0.4)",
+                    fill: true,
+                    data: accessData
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: "Accesos por Minuto"
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+    
+    
+    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+
+</body>
+
+</html>

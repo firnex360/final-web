@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    
+
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "env": {
+                "MONGODB_URL": "mongodb+srv://fernandorodriguezb27:8eLDve6oHLmBiTPa@cluster-test.gn22mgw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster-test"
+            }
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "practica.Main",
+            "projectName": "app",
+            "env": {
+                "MONGODB_URL": "mongodb+srv://fernandorodriguezb27:8eLDve6oHLmBiTPa@cluster-test.gn22mgw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster-test"
+            }
+        }
+    ]
+}

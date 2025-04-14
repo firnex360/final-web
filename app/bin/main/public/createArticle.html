@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Article</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<style>
+        body{
+            background: rgb(0, 9, 17);
+            padding: 1%;
+        }
+        .ctx{
+            margin: auto;
+            width: 100%;
+            max-width: 800px; /* Limitar el ancho para mejor apariencia */
+            border-radius: 20px;
+            box-shadow: 0px 0px 50px 15px rgb(0, 0, 0);
+            font-family:Arial, Helvetica, sans-serif;
+            text-align: center;
+            background-color: rgb(212, 229, 240);
+            padding: 30px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="ctx">
+        <form class="form-signin" th:action="${article != null} ? @{/editArticle} : @{/createArticle}" method="post">
+            <h2 th:text="${article != null} ? 'EDITAR ARTÍCULO' : 'CREAR ARTÍCULO'"></h2>
+
+            <!-- Article ID -->
+            <input type="hidden" name="articleID" th:value="${article != null} ? ${article.id} : ''">
+
+            <div class="mb-3 row">
+                <label class="col-sm-2 col-form-label">Autor:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control-plaintext" title="title" name="author" th:value="${article != null} ? ${article.author.username} : 'autor'" readonly>
+                </div>
+            </div>
+
+            <div class="form-group">
+                Title <input type="text" name="title" class="form-control mb-3" placeholder="Title" th:value="${article != null} ? ${article.title} : ''" required autofocus>
+            </div>
+
+            <div class="form-group">
+            Cuerpo <textarea type="text" name="body" class="form-control mb-3" placeholder="Lorem Ipsum" th:text="${article != null} ? ${article.body} : ''" rows="4" cols="50" required autofocus></textarea>
+            </div>
+
+            <div class="form-group">
+            Etiquetas (recuerda separarlos con comas!): <input type="text" name="tags" class="form-control mb-3" placeholder="Tags" th:value="${tagString != null} ? ${tagString} : ''" autofocus>
+            </div>
+
+            <br>
+            <div class="d-flex gap-2">
+                <a href="/viewListArticle" class="btn btn-lg btn-secondary flex-grow-1" type="button">Volver</a>
+                <button class="btn btn-lg btn-primary flex-grow-1" title="button" type="submit" th:unless="${isView}" th:text="${article != null} ? 'Guardar Cambios' : 'Crear'"></button>
+            </div>
+            <p class="mt-5 mb-3 text-muted">&copy; MITA & FERB</p>
+        </form>
+    </div>
+
+     <!-- Scripts de Bootstrap -->
+     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+ 
+</body>
+
+</html>

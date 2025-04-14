@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/table.css">
+
+    <title>listar Usuarios</title>
+
+</head>
+<body>
+
+    <header>
+        <h2>¡Bienvenido, <span th:text="${user}"></span>! - Usuarios</h2>
+        <nav role="custom-dropdown">
+            <input type="checkbox" id="button">
+            <label for="button" onclick></label>
+
+            <ul>
+
+                <!-- Opción condicional en el menú -->
+                <li>
+                    <form action="/closeSession" method="post" class="d-inline">
+                        <button type="submit" class="nav-link">Cerrar Sesión</button>
+                    </form>
+                </li>
+                <li>
+                    <a href="createShortURL.html"><button type="submit" class="nav-link">Generar URL acortado</button></a>
+                </li>
+                <li>
+                    <form action="/viewListArticle" method="get">
+                        <button type="submit" class="nav-link">Listar Articulo</button>
+                    </form>
+                </li>
+                <li>
+                    <form action="/updateSpecificArticle" method="post" class="d-inline">
+                        <button type="submit" class="nav-link">Crear Articulo</button>
+                    </form>
+                </li>
+                <li>
+                    <form action="/updateUserSpecific" method="post" class="d-inline">
+                        <button type="submit" class="nav-link">Crear Usuario</button>
+                    </form>
+                </li>
+
+
+            </ul>
+        </nav>
+
+    </header>
+
+<div class="container">
+    
+    <ul class="responsive-table">
+        <li class="table-header">
+            <div class="col">Profile Picture</div>
+            <div class="col">username</div>
+            <div class="col">name</div>
+            <div class="col">admin</div>
+            <div class="col">author</div>
+        </li>
+        <li class="table-row" th:each="user : ${userList}">
+            <div class="col col-1">
+                <!-- Mostrar la imagen si existe -->
+                <img th:if="${user.profilePicture != null}"
+                    th:src="'data:' + ${user.profilePicture.mimeType} + ';base64,' + ${user.profilePicture.fotoBase64}"
+                    alt="Foto de perfil"
+                    style="width: 50px; height: 50px; border-radius: 50%;"/>
+                <!-- Mostrar un mensaje o ícono si no hay foto -->
+                <span th:unless="${user.profilePicture != null}">Sin foto</span>
+            </div>
+            <div class="col" th:text="${user.username}"></div>
+            <div class="col" th:text="${user.name}"></div>
+            <div class="col" th:text="${user.admin}"></div>
+            <div class="col" th:text="${user.author}"></div>
+            <div class="col">
+                <div class="d-flex gap-2">
+                    <form action="/updateUserSpecific" method="post" class="d-inline">
+                        <input type="hidden" name="username" th:value="${user.username}">
+                        <button type="submit" class="btn btn-warning">Editar</button>
+                    </form>
+                    <span class="mx-2">|</span>
+                    <form action="/deleteUser" method="post" class="d-inline">
+                        <input type="hidden" name="username" th:value="${user.username}">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </li>
+
+    </ul>
+
+<!-- PAGINATION CONTROL in html-->
+    <div>
+        <a th:if="${page > 1}" th:href="@{/viewListUser(page=${page - 1}, pageSize=${pageSize})}">Previous</a>
+        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+            <a th:if="${i != page}" th:href="@{/viewListUser(page=${i}, pageSize=${pageSize})}" th:text="${i}">Page</a>
+            <span th:unless="${i != page}" th:text="${i}">Page</span>
+        </span>
+        <a th:if="${page < totalPages}" th:href="@{/viewListUser(page=${page + 1}, pageSize=${pageSize})}">Next</a>
+    </div>
+
+</div>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+
+</body>
+</html>

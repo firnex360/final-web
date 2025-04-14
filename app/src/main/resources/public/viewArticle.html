@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Article</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <style>
+        h2 {
+            text-shadow: 2px 2px #7c7c7c;
+            color: rgb(0, 16, 17);
+        }
+
+        body {
+            background: rgb(0, 16, 17);
+            padding: 1%;
+        }
+
+        .ctx {
+            margin: auto;
+            width: 80%;
+            border-radius: 20px;
+            box-shadow: 0px 0px 50px 15px rgb(0, 0, 0);
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            background: rgb(205, 218, 223);
+            display: flex;
+            padding: 1%;
+            flex-direction: column;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .eight {
+            display: flex;
+        }
+
+        .nine {
+            width: 80%;
+        }
+
+        .ten {
+            flex-direction: row;
+            width: auto;
+        }
+
+        .comment-box {
+            text-align: left;
+            background-color: #e0e7eb;
+            /* Light background */
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        label,
+        .commentSection table th {
+            text-align: left;
+            /* Align text left */
+            width: 100%;
+        }
+
+        #chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            font-family: Arial, sans-serif;
+        }
+
+        #chat-header {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #chat-body {
+            display: none;
+            padding: 10px;
+        }
+
+        #chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        #chat-input {
+            width: 210px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #send-button {
+            padding: 6px 10px;
+            border: none;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 5px; /* Small spacing */
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div class="ctx">
+
+        <input type="hidden" name="articleID" th:value="${article.id}">
+
+        <h2><span id="title" th:text="${article.title}"></span></h2><br>
+
+        <label class="col-sm-2 col-form-label">Autor:</label>
+        <input type="text" class="form-control-plaintext"
+            th:value="${article.author != null } ? ${article.author.username} : 'anonymous'" disabled>
+
+        <div class="col-sm-10">
+        </div>
+
+        <label class="col-sm-2 col-form-label">Fecha:</label>
+        <input type="text" name="date" class="form-control" th:value="${dateString}" disabled><br>
+        <textarea name="body" class="form-control mb-3" rows="4" cols="50" th:text="${article.body}"
+            disabled></textarea><br>
+        <label class="col-sm-2 col-form-label">Etiquetas:</label>
+        <input type="text" name="tags" class="form-control mb-3" placeholder="Tags"
+            th:value="${tagString != null} ? ${tagString} : ''" disabled>
+
+
+
+        <hr />
+
+        <div class="commentSection">
+
+            <form th:action="@{/createComment}" method="post" class="eight">
+                <input type="hidden" name="username" th:value="${user != null} ? ${user.username} : 'Invitado'">
+                <input type="hidden" name="articleID" th:value="${article.id}">
+                <input type="text" name="comment" class="form-control nine"
+                    placeholder="¿Te interesa este artículo? ¡Escribe!">
+                <span style="margin-left: 20px;"></span>
+                <form action="/createComment" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Agregar comentario</button>
+                </form>
+            </form>
+
+            <br>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Comentarios</th>
+                    </tr>
+                </thead>
+                <tbody th:if="${comments != null}">
+                    <tr th:each="comment : ${comments}">
+                        <td colspan="2">
+                            <div class="comment-box">
+                                <input type="text" name="date" class="form-control" title="title"
+                                    th:value="${#dates.format(comment.date, 'dd-MM-yyyy')}" disabled><br>
+                                <strong th:text="${comment.author.name}">bot</strong>:
+                                <span th:text="${comment.comment}">refresca la pagina para ver tu ultimo
+                                    comentario!!!</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+        <br>
+        <div class="button-container">
+            <a href="/viewListArticle"><button class="btn btn-lg btn-secondary btn-block"
+                    type="button">Volver</button></a>
+        </div>
+
+
+        <p class="mt-5 mb-3 text-muted">&copy; MITA & FERB</p>
+
+        <script src="/js/chatbox.js"></script>
+        <script src="/js/chat.js"></script>
+
+        
+    </div>
+    
+    <div id="chat-container">
+        <div id="chat-header" onclick="toggleChat()">💬 Chat con el Autor</div>
+        <div id="chat-body">
+            <div id="chat-messages"></div>
+            <div style="display: inline-block;">
+                <input type="text" id="chat-input" placeholder="Type a message..." />
+                <button id="send-button" onclick="sendMessageNew()">Send</button>
+            </div>
+        </div>
+    </div>
+    
+</body>
+
+</html>

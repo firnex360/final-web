@@ -1,0 +1,212 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "",
+    "version": ""
+  },
+  "paths": {
+    "/api/user/{username}": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Username of the user",
+            "required": false,
+            "deprecated": false,
+            "allowEmptyValue": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of URLs with statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShortURL"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      },
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Username of the user",
+            "required": false,
+            "deprecated": false,
+            "allowEmptyValue": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "original",
+            "in": "query",
+            "description": "URL to be shorten",
+            "required": false,
+            "deprecated": false,
+            "allowEmptyValue": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shortened URL with preview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShortURLResponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShortURLResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "shortUrl": {
+            "type": "string"
+          },
+          "originalUrl": {
+            "type": "string"
+          },
+          "previewImageBase64": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        }
+      },
+      "Image": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fotoBase64": {
+            "type": "string"
+          }
+        }
+      },
+      "ShortURL": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accessLogs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/URLAccessLog"
+            }
+          },
+          "originalUrl": {
+            "type": "string"
+          },
+          "shortUrl": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accessCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "accessCount"
+        ]
+      },
+      "URLAccessLog": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "os": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "clientDomain": {
+            "type": "string"
+          },
+          "accessTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "urlEntry": {
+            "$ref": "#/components/schemas/ShortURL"
+          },
+          "browser": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "admin": {
+            "type": "boolean"
+          },
+          "username": {
+            "type": "string"
+          },
+          "author": {
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string"
+          },
+          "profilePicture": {
+            "$ref": "#/components/schemas/Image"
+          }
+        },
+        "required": [
+          "admin",
+          "author"
+        ]
+      }
+    }
+  }
+}
