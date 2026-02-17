@@ -16,7 +16,6 @@ import jakarta.persistence.PersistenceException;
 import jakarta.persistence.criteria.CriteriaQuery;
 import practica.Main;
 
-@Entity
 public class GeneralClass<T> {
 
     // private static final Map<Class<?>, Map<Object, Object>> database = new

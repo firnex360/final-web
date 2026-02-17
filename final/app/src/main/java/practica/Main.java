@@ -78,6 +78,10 @@ public class Main {
 
         System.out.println("ORM-JPA METHOD THIS TIME");
 
+        // Get port from environment variable or use default
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "7000"));
+        System.out.println("Starting server on port: " + port);
+
         // Iniciando la base de datos.
         if (connectionMethod.isEmpty()) {
             BootStrapServices.getInstance().init();
@@ -124,7 +128,8 @@ public class Main {
 
         //#####################################################################
         //GRPC
-        int grpcPort = 5000;
+        int grpcPort = Integer.parseInt(System.getenv().getOrDefault("GRPC_PORT", "5000"));
+        System.out.println("Starting gRPC server on port: " + grpcPort);
         Server server = ServerBuilder.forPort(grpcPort)
             .addService(new ShortUrlRnServiceGrpc())
             .build()
@@ -156,7 +161,7 @@ public class Main {
                 });
             });
             
-        }).start(7000);
+        }).start(port);
 
         app.ws("/chat", ws -> {
 

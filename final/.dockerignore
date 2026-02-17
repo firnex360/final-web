@@ -1,0 +1,34 @@
+# Ignore build artifacts
+app/build/
+app/bin/
+*.class
+
+# Ignore Gradle cache
+.gradle/
+**/build/
+
+# Ignore IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore documentation
+README.md
+readme.txt
+
+# Ignore Python client
+client-python/
